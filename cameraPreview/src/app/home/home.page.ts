@@ -3,6 +3,7 @@ import '@capacitor-community/camera-preview';
 import {
   CameraPreview,
   CameraPreviewOptions,
+  CameraPreviewPictureOptions,
 } from '@capacitor-community/camera-preview';
 
 @Component({
@@ -12,19 +13,38 @@ import {
   standalone: false,
 })
 export class HomePage {
-  image = null;
+  image = '';
   cameraActive = false;
 
   constructor() {}
 
   openCamera() {
-    //const cameraPreview = (window as any).CapacitorCommunityCameraPreview;
     const camerapreviewOptions: CameraPreviewOptions = {
       position: 'rear',
       parent: 'cameraPreview',
       className: 'cameraPreview',
+      toBack: true,
     };
     CameraPreview.start(camerapreviewOptions);
     this.cameraActive = true;
+  }
+
+  async stopCamera() {
+    await CameraPreview.stop();
+    this.cameraActive = false;
+  }
+
+  async captureImage() {
+    const cameraPreviewPictureOptions: CameraPreviewPictureOptions = {
+      quality: 85,
+    };
+
+    const result = await CameraPreview.capture(cameraPreviewPictureOptions);
+    this.image = `data:image/jpeg;base64,${result.value}`;
+    this.stopCamera();
+  }
+
+  flipCamera() {
+    CameraPreview.flip();
   }
 }
